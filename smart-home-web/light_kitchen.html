@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags always come first -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap/3.3.2/css/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">-->
+    <link href="css/bootstrap-toggle.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+          <a class="navbar-brand" href="index.html">SmartHome</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="active" class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Light <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Hall</a></li>
+                <li><a href="#">Living room</a></li>
+                <li><a href="#">Bedroom</a></li>
+                <li><a href="#">Playroom</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Kitchen</a></li>
+                <li><a href="#">Toilet</a></li>
+                <li><a href="#">Bathroom</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Other</a></li>
+              </ul>
+            </li>
+            <li><a href="#">Ссылка</a></li>
+            <li><a href="#">Ссылка</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+    <div class="container" style="background-color: yellow">
+        <div class="row" style="margin-bottom:15px">
+            <div class="col-xs-6 col-md-10">
+                <label>Backlight</label>
+            </div>
+            <div class="col-xs-6 col-md-2">
+                <label class="checkbox-inline">
+                    <input id="backlight-status" type="checkbox" checked data-toggle="toggle">
+                </label>
+            </div>
+        </div>
+        <div class="row">          
+            <div class="col-xs-6 col-md-10">
+                <label>Chandelier</label>
+            </div>
+            <div class="col-xs-6 col-md-2">
+                <label class="checkbox-inline">
+                    <input type="checkbox" checked data-toggle="toggle">
+                </label>
+            </div>
+        </div>
+        <div class="row">   
+            <div id="console-event"></div>
+        </div>
+    </div>
+    <!-- jQuery first, then Tether, then Bootstrap JS. -->
+    <script src="jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.7/js/tether.min.js" integrity="sha384-XTs3FgkjiBgo8qjEjBk0tGmf3wPrWtA6coPfQDfFEY8AnYJwjalXCiosYRBIBZX8" crossorigin="anonymous"></script>
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js" integrity="sha384-BLiI7JTZm+JWlgKa0M0kGRpJbF2J8q+qreVrKBC47e3K6BW78kGLrCkeRX6I9RoK" crossorigin="anonymous"></script>-->
+    <script src="bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-toggle.min.js"></script>
+    <script>  
+        function show()  
+        {  
+            $.ajax({
+                type: "POST",
+                url: "time.php",  
+                cache: false,  
+                success: function(html){  
+                    $("#console-event").html(html);  
+                }  
+            });  
+        }  
+      
+        $(document).ready(function(){  
+            show();  
+            setInterval('show()',1000);  
+        });  
+    </script> 
+  </body>
+</html>
