@@ -102,7 +102,7 @@
                     chandelier_status : $('#chandelier_status').prop('checked')}),
                 cache: false,  
                 success: function(html){                      
-                    alert ('jQuery подключен и отлично работает!');
+                    #alert ('jQuery подключен и отлично работает!');
                     $("#console_event").html(html.backlight_status); 
                     if (html.backlight_status == true){
                         $('#backlight_status').prop('checked', true).change()
