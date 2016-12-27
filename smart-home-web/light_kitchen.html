@@ -56,7 +56,7 @@
             </div>
             <div class="col-xs-6 col-md-2">
                 <label class="checkbox-inline">
-                    <input id="backlight-status" type="checkbox" checked data-toggle="toggle">
+                    <input id="backlight_status" type="checkbox" checked data-toggle="toggle">
                 </label>
             </div>
         </div>
@@ -66,12 +66,12 @@
             </div>
             <div class="col-xs-6 col-md-2">
                 <label class="checkbox-inline">
-                    <input type="checkbox" checked data-toggle="toggle">
+                    <input id="chandelier_status" type="checkbox" checked data-toggle="toggle">
                 </label>
             </div>
         </div>
         <div class="row">   
-            <div id="console-event"></div>
+            <div id="console_event"></div>
         </div>
     </div>
     <!-- jQuery first, then Tether, then Bootstrap JS. -->
@@ -85,18 +85,42 @@
         {  
             $.ajax({
                 type: "POST",
-                url: "time.php",  
+                url: "cgi-bin/light.py", 
+                data: "backlight_status="+$('#backlight_status').prop('checked'),  
                 cache: false,  
                 success: function(html){  
-                    $("#console-event").html(html);  
+                    $("#console_event").html(html);  
                 }  
             });  
-        }  
+        } 
+        
+        $('#backlight_status').change(function() {
+            $.ajax({
+                type: "POST",
+                url: "cgi-bin/light.py", 
+                data: ({backlight_status : $('#backlight_status').prop('checked'),
+                    chandelier_status : $('#chandelier_status').prop('checked')}),
+                cache: false,  
+                success: function(html){                      
+                    alert ('jQuery подключен и отлично работает!');
+                    $("#console_event").html(html.backlight_status); 
+                    if (html.backlight_status == true){
+                        $('#backlight_status').prop('checked', true).change()
+                    }
+                    else{
+                        $('#backlight_status').prop('checked', false).change()
+                    }
+                    if (html.chandelier_status == true){
+                        $('#chandelier_status').prop('checked', true).change()
+                    }
+                    else{
+                        $('#chandelier_status').prop('checked', false).change()
+                    }
+                }  
+            });  
+        })
       
-        $(document).ready(function(){  
-            show();  
-            setInterval('show()',1000);  
-        });  
+ 
     </script> 
   </body>
 </html>
