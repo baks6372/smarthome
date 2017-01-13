@@ -49,7 +49,47 @@
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
     </nav>
-    <div class="container" style="background-color: yellow">
+    <div class="container">
+        <div class="row" style="margin-bottom:15px">
+            <div class="col-xs-6 col-md-1">
+<!--
+                <div style=" position:relative; top:0px; left:0px;">
+                    <img id="backlight_onbulb" src="resources/onbulb.png" alt="" style=" position:absolute; top:0px; left:0px; visibility: visible;" class="img-responsive">
+                    <img id="backlight_offbulb" src="resources/offbulb.png" alt="" style=" position:absolute; top:0px; left:0px; visibility: visible;" class="img-responsive">
+                </div>
+-->
+                <span class="glyphicon glyphicon-certificate" id="backlight_status" style="font-size: 40px;"></span>
+            </div>
+            <div class="col-xs-6 col-md-9">
+                <label style="font-size: 30px;">Backlight</label>
+            </div>
+            <div class="col-xs-6 col-md-2">
+                <label class="checkbox-inline">
+                    <input id="backlight_switch_status"  type="checkbox" checked data-toggle="toggle">
+                </label>
+            </div>            
+        </div>
+        <div class="row"> 
+            <div class="col-xs-6 col-md-1">
+<!--
+                <div style=" position:relative; top:0px; left:0px;">
+                    <img id="chandelier_onbulb" src="resources/onbulb.png" alt="" style=" position:absolute; top:0px; left:0px; visibility: visible;" class="img-responsive">
+                    <img id="chandelier_offbulb" src="resources/offbulb.png" alt="" style=" position:absolute; top:0px; left:0px; visibility: visible;" class="img-responsive">
+                </div>
+-->
+                <span class="glyphicon glyphicon-certificate" id="chandelier_status" style="font-size: 40px;"></span>
+            </div>
+            <div class="col-xs-6 col-md-9">
+                <label style="font-size: 30px;">Chandelier</label>
+            </div>
+            <div class="col-xs-6 col-md-2">
+                <label class="checkbox-inline">
+                    <input id="chandelier_switch_status" type="checkbox" checked data-toggle="toggle">
+                </label>
+            </div>
+        </div>
+    </div>
+      <!--<div class="container" style="background-color: yellow">
         <div class="row" style="margin-bottom:15px">
             <div class="col-xs-6 col-md-10">
                 <label>Backlight</label>
@@ -73,7 +113,7 @@
         <div class="row">   
             <div id="console_event"></div>
         </div>
-    </div>
+    </div>-->
     <!-- jQuery first, then Tether, then Bootstrap JS. -->
     <script src="jquery/3.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.7/js/tether.min.js" integrity="sha384-XTs3FgkjiBgo8qjEjBk0tGmf3wPrWtA6coPfQDfFEY8AnYJwjalXCiosYRBIBZX8" crossorigin="anonymous"></script>
@@ -81,44 +121,94 @@
     <script src="bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script src="js/bootstrap-toggle.min.js"></script>
     <script>  
-        function show()  
+        function getStatus()  
         {  
             $.ajax({
                 type: "POST",
                 url: "cgi-bin/light.py", 
-                data: "backlight_status="+$('#backlight_status').prop('checked'),  
+                data: ({backlight_switch_status : $('#backlight_switch_status').prop('checked'),
+                    chandelier_switch_status : $('#chandelier_switch_status').prop('checked')}),
                 cache: false,  
-                success: function(html){  
-                    $("#console_event").html(html);  
+                dataType: "json",
+                success: function(data){                      
+//                    alert ('jQuery подключен и отлично работает!');
+//                    $("#console_event").html(html.backlight_switch_status); 
+                    if (data.backlight_status == "true"){
+                        $('#backlight_status').css("color", "yellow")
+                    }
+                    else{
+                        $('#backlight_status').css("color", "grey")
+                    }
+                    if (data.chandelier_status == "true"){
+                        $('#chandelier_status').css("color", "yellow")
+//                        $('#chandelier_onbulb').show();
+//                        $('#chandelier_offbulb').hide();
+                    }
+                    else{
+                        $('#chandelier_status').css("color", "grey")
+//                        $('#chandelier_onbulb').hide();
+//                        $('#chandelier_offbulb').show();
+                    }
+//                    alert(data.backlight_status);
+                    setTimeout('getStatus();', 1000);
                 }  
             });  
         } 
         
-        $('#backlight_status').change(function() {
-            $.ajax({
-                type: "POST",
-                url: "cgi-bin/light.py", 
-                data: ({backlight_status : $('#backlight_status').prop('checked'),
-                    chandelier_status : $('#chandelier_status').prop('checked')}),
-                cache: false,  
-                success: function(html){                      
-                    #alert ('jQuery подключен и отлично работает!');
-                    $("#console_event").html(html.backlight_status); 
-                    if (html.backlight_status == true){
-                        $('#backlight_status').prop('checked', true).change()
-                    }
-                    else{
-                        $('#backlight_status').prop('checked', false).change()
-                    }
-                    if (html.chandelier_status == true){
-                        $('#chandelier_status').prop('checked', true).change()
-                    }
-                    else{
-                        $('#chandelier_status').prop('checked', false).change()
-                    }
-                }  
-            });  
+        $('#backlight_switch_status').change(function() {   
+            if ($('#backlight_switch_status').prop('checked') == true){
+//                $('#backlight_onbulb').show();
+//                $('#backlight_offbulb').hide();
+            }
+            else{
+//                $('#backlight_onbulb').hide();
+//                $('#backlight_offbulb').show();
+            }
         })
+        $('#chandelier_switch_status').change(function() {
+   
+            if ($('#chandelier_switch_status').prop('checked') == true){
+//                $('#chandelier_onbulb').show();
+//                $('#chandelier_offbulb').hide();
+            }
+            else{
+//                $('#chandelier_onbulb').hide();
+//                $('#chandelier_offbulb').show();
+            }
+        })
+        $( document ).ready(function() {
+            $('#backlight_onbulb').show();
+            $('#backlight_offbulb').hide();
+            $('#chandelier_onbulb').show();
+            $('#chandelier_offbulb').hide();
+            $('#backlight_switch_status').prop('checked', false).change()
+            $('#chandelier_switch_status').prop('checked', false).change()
+            setTimeout('getStatus();', 1000);
+        });
+//            $.ajax({
+//                type: "POST",
+//                url: "cgi-bin/light.py", 
+//                data: ({backlight_status : $('#backlight_status').prop('checked'),
+//                    chandelier_status : $('#chandelier_status').prop('checked')}),
+//                cache: false,  
+//                success: function(html){                      
+//                    //alert ('jQuery подключен и отлично работает!');
+//                    $("#console_event").html(html.backlight_status); 
+//                    if (html.backlight_status == true){
+//                        $('#backlight_status').prop('checked', true).change()
+//                    }
+//                    else{
+//                        $('#backlight_status').prop('checked', false).change()
+//                    }
+//                    if (html.chandelier_status == true){
+//                        $('#chandelier_status').prop('checked', true).change()
+//                    }
+//                    else{
+//                        $('#chandelier_status').prop('checked', false).change()
+//                    }
+//                }  
+//            });  
+//        })
       
  
     </script> 
