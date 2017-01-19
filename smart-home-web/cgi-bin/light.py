@@ -23,7 +23,7 @@ db_path = "/home/evgeny/smarthome/smarthome.db"
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
-sensor_group = "light/kitchen"
+sensor_group = "/home/light/kitchen"
 
 command_str = "SELECT sensor_name, sensor_status FROM sensors where sensor_group = \"%s\";" % (sensor_group)
 try:
@@ -33,7 +33,9 @@ except Exception as e:
     exit(1)
     
 sensors_list = cursor.fetchall()
-#print (sensors_list)
+
+
+#print (sensors_list) 
 
 data = {}
 
@@ -41,27 +43,123 @@ data = {}
 form = cgi.FieldStorage() 
    
 # Get data from fields
-backlight_switch_status = form.getvalue('backlight_switch_status')
-chandelier_switch_status = form.getvalue('chandelier_switch_status')
+kitchen_backlight_relay = form.getvalue('kitchen_backlight_relay')
+kitchen_chandelier_relay = form.getvalue('kitchen_chandelier_relay')
 config = configparser.RawConfigParser()
 res = config.read("light.cfg")
 sections = config.sections()
 
 have_changes = False
-if backlight_switch_status:
-    if(backlight_switch_status != config['kitchen']['backlight_switch_status']):
+if kitchen_backlight_relay:
+    if(kitchen_backlight_relay != config['kitchen']['kitchen_backlight_relay']):
         have_changes = True
-        config.set("kitchen","backlight_switch_status",backlight_switch_status)
+        config.set("kitchen","kitchen_backlight_relay",kitchen_backlight_relay)
         msgs = []
-        msgs.append({'topic': sensor_group, 'payload': "backlight_switch_status="+backlight_switch_status})
+        
+        sensor_name = "kitchen_backlight_relay"
+        sensor_status = kitchen_backlight_relay
+        
+        command_str = "update sensors set sensor_status = '%s' where sensor_name='%s';" % (sensor_status, sensor_name)     
+        try:
+            cursor.execute(command_str)
+        except Exception as e:
+            print(command_str)
+            print(e)
+            exit(1)
+        conn.commit()
+        
+        command_str = "SELECT sensor_settings FROM sensors where sensor_name = \"%s\";" % (sensor_name)
+        try:
+            cursor.execute(command_str)
+        except Exception as e:
+            print(e,file=sys.stderr)
+            exit(1)
+            
+        change_settins_str = cursor.fetchall()
+        change_value_str = json.loads(change_settins_str[0][0])
+        change_value_str["value"] = sensor_status
+        change_value_str = json.dumps(change_value_str)
+        #print(change_value_str)
+        
+        command_str = "update sensors set sensor_settings = '%s' where sensor_name='%s';" % (change_value_str, sensor_name)     
+        try:
+            cursor.execute(command_str)
+        except Exception as e:
+            print(command_str)
+            print(e)
+            exit(1)
+        conn.commit()
+        
+        command_str = "SELECT sensor_id, sensor_settings FROM sensors where sensor_name = \"%s\";" % (sensor_name)
+        try:
+            cursor.execute(command_str)
+        except Exception as e:
+            print(e,file=sys.stderr)
+            exit(1)
+    
+        result_str = cursor.fetchall()
+        sensor_id = result_str[0][0]
+        sensor_settings = result_str[0][1]
+        
+        msgs.append({'topic': sensor_id, 'payload': sensor_settings})
+
         publish.multiple(msgs, hostname="localhost")
-if chandelier_switch_status:
-    if(chandelier_switch_status != config['kitchen']['chandelier_switch_status']):
-        have_changes = True 
-        config.set("kitchen","chandelier_switch_status",chandelier_switch_status)
+if kitchen_chandelier_relay:
+    if(kitchen_chandelier_relay != config['kitchen']['kitchen_chandelier_relay']):
+        have_changes = True
+        config.set("kitchen","kitchen_chandelier_relay",kitchen_chandelier_relay)
         msgs = []
-        msgs.append({'topic': sensor_group, 'payload': "chandelier_switch_status="+chandelier_switch_status})
-        publish.multiple(msgs, hostname="localhost")  
+        
+        sensor_name = "kitchen_chandelier_relay"
+        sensor_status = kitchen_chandelier_relay
+        
+        command_str = "update sensors set sensor_status = '%s' where sensor_name='%s';" % (sensor_status, sensor_name)     
+        try:
+            cursor.execute(command_str)
+        except Exception as e:
+            print(command_str)
+            print(e)
+            exit(1)
+        conn.commit()
+        
+        command_str = "SELECT sensor_settings FROM sensors where sensor_name = \"%s\";" % (sensor_name)
+        try:
+            cursor.execute(command_str)
+        except Exception as e:
+            print(e,file=sys.stderr)
+            exit(1)
+            
+        change_settins_str = cursor.fetchall()
+        change_value_str = json.loads(change_settins_str[0][0])
+        change_value_str["value"] = sensor_status
+        change_value_str = json.dumps(change_value_str)
+        #print(change_value_str)
+        
+        command_str = "update sensors set sensor_settings = '%s' where sensor_name='%s';" % (change_value_str, sensor_name)     
+        try:
+            cursor.execute(command_str)
+        except Exception as e:
+            print(command_str)
+            print(e)
+            exit(1)
+        conn.commit()
+        
+        command_str = "SELECT sensor_id, sensor_settings FROM sensors where sensor_name = \"%s\";" % (sensor_name)
+        try:
+            cursor.execute(command_str)
+        except Exception as e:
+            print(e,file=sys.stderr)
+            exit(1)
+    
+        result_str = cursor.fetchall()
+        sensor_id = result_str[0][0]
+        sensor_settings = result_str[0][1]
+        
+        #print ("sensor_id = %s , sensor_settings = %s" % (sensor_id,sensor_settings))
+        
+        msgs.append({'topic': sensor_id, 'payload': sensor_settings})
+
+        publish.multiple(msgs, hostname="localhost")
 #
 if have_changes == True:
     with open('light.cfg', 'w') as configfile:

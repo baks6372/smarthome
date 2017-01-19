@@ -121,13 +121,44 @@
     <script src="bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script src="js/bootstrap-toggle.min.js"></script>
     <script>  
-        function getStatus()  
+        function getInitValues()  
         {  
             $.ajax({
                 type: "POST",
+                url: "cgi-bin/get_init_values.py", 
+                data: ({init_values : "kitchen_backlight_relay,kitchen_chandelier_relay"}),
+                cache: false,  
+                dataType: "json",
+                success: function(data){                      
+                    if (data.kitchen_backlight_relay == 1){
+                        $('#backlight_switch_status').prop('checked', true).change()
+                    }
+                    else{
+                        $('#backlight_switch_status').prop('checked', false).change()
+                    }
+                    if (data.kitchen_chandelier_relay == 1){
+                        $('#chandelier_switch_status').prop('checked', true).change()
+                    }
+                    else{
+                        $('#chandelier_switch_status').prop('checked', false).change()
+                    }
+                }  
+            });  
+        }
+        function getStatus()  
+        {  
+            var kitchen_backlight_relay = 0, kitchen_chandelier_relay = 0
+            if ($('#backlight_switch_status').prop('checked') == true){
+                kitchen_backlight_relay=1
+            }
+            if ($('#chandelier_switch_status').prop('checked') == true){
+                kitchen_chandelier_relay = 1
+            }
+            $.ajax({
+                type: "POST",
                 url: "cgi-bin/light.py", 
-                data: ({backlight_switch_status : $('#backlight_switch_status').prop('checked'),
-                    chandelier_switch_status : $('#chandelier_switch_status').prop('checked')}),
+                data: ({kitchen_backlight_relay : kitchen_backlight_relay,
+                    kitchen_chandelier_relay : kitchen_chandelier_relay}),
                 cache: false,  
                 dataType: "json",
                 success: function(data){                      
@@ -150,7 +181,7 @@
 //                        $('#chandelier_offbulb').show();
                     }
 //                    alert(data.backlight_status);
-                    setTimeout('getStatus();', 1000);
+                    setTimeout('getStatus();', 100);
                 }  
             });  
         } 
@@ -183,7 +214,8 @@
             $('#chandelier_offbulb').hide();
             $('#backlight_switch_status').prop('checked', false).change()
             $('#chandelier_switch_status').prop('checked', false).change()
-            setTimeout('getStatus();', 1000);
+            getInitValues();
+            setTimeout('getStatus();', 100);
         });
 //            $.ajax({
 //                type: "POST",
