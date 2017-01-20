@@ -14,7 +14,7 @@ cursor = conn.cursor()
 
 def on_connect(client, userdata, rc):  
     print("Connected with result code: %s" % rc)
-    client.subscribe("light/kitchen")
+    client.subscribe("/devices/value/#")
     #client.subscribe("mqtt/zigbee/led")
 
 def on_message(client, userdata, msg):  
@@ -22,19 +22,24 @@ def on_message(client, userdata, msg):
     command = ""
     print("%s: %s" % (msg.topic, msg.payload.decode('utf-8')))
     
-    mqtt_payload = msg.payload.decode('utf-8')
-    mqtt_payload_val = mqtt_payload.split('=')
-    sensor_status = mqtt_payload_val[1]
-    sensor_status = sensor_status.strip(' ')
-    sensor_group = msg.topic
+    #mqtt_payload = msg.payload.decode('utf-8')
+    #mqtt_payload_val = mqtt_payload.split('=')
+    #sensor_status = mqtt_payload_val[1]
+    #sensor_status = sensor_status.strip(' ')
+    #sensor_group = msg.topic
     
-    SENSOR_STATUS = "true"  
-    SENSOR_GROUP = "light/kitchen"    
-    SENSOR_NAME = "backlight_status" 
-    sensor_name = mqtt_payload_val[0] 
-    sensor_name = sensor_name[:sensor_name.find('_')]+'_status'
+#    SENSOR_STATUS = 1 
+#     SENSOR_GROUP = "light/kitchen"    
+#    SENSOR_NAME = "backlight_status"
+
+    #settings_str = json.loads(msg.payload.decode('utf-8'))           
+    sensor_status = msg.payload.decode('utf-8')#settings_str["value"]
+    #sensor_name = mqtt_payload_val[0] 
+    #sensor_name = '/devices/0037/gpio1/value'
+    sensor_name = msg.topic[msg.topic.find("/value")+6:]
     print(sensor_name)
-    command_str = "update sensors set sensor_status = '%s' where sensor_group='%s' and sensor_name='%s';" % (sensor_status, sensor_group,sensor_name)     
+    print(sensor_status)
+    command_str = "update sensors set sensor_status = '%s' where sensor_id='%s';" % (sensor_status, sensor_name)     
     try:
         cursor.execute(command_str)
     except Exception as e:

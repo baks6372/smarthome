@@ -26,11 +26,27 @@ cursor = conn.cursor()
 data = {}
 
 config = configparser.RawConfigParser()
-res = config.read("light.cfg")
+res = config.read("smarthome.cfg")
 sections = config.sections()
 
-data ['kitchen_backlight_relay'] = config['kitchen']['kitchen_backlight_relay']
-data ['kitchen_chandelier_relay'] = config['kitchen']['kitchen_chandelier_relay']
+# Create instance of FieldStorage 
+form = cgi.FieldStorage() 
+
+init_values_str = form.getvalue('init_values')
+init_values = init_values_str.split(',')
+
+for init_value in init_values:
+    #data[init_value] = config['devices'][init_value]
+    command_str = "SELECT sensor_status FROM sensors where sensor_name = \"%s\";" % (init_value)
+    try:
+        cursor.execute(command_str)
+    except Exception as e:
+        print(e,file=sys.stderr)
+        exit(1)
+    value_changed_check = cursor.fetchall()
+    data[init_value]= value_changed_check[0][0]
+    
+
     
 print ("Content-Type: application/json\n\n")
 print(json.dumps(data, sort_keys=True))
